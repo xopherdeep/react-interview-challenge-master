@@ -14,7 +14,7 @@ class SelectTeam extends Component {
       </option>;
     }
 
-    return <select disabled={selectTeam.props.disabled}>{options}</select>
+    return <select name="team" disabled={selectTeam.props.disabled}>{options}</select>
   }
 }
 

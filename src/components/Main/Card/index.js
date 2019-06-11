@@ -17,12 +17,11 @@ class Card extends Component {
 
   saveCard = (e) => {
     const card = this;
-    const player = null;
+    const player = e.target;
     e.preventDefault();
-    console.log(e.target.id.value);
 
     const API = {
-      player : 'http://localhost:3008/players/'+e.target.id.value,
+      player : 'http://localhost:3008/players/'+player.id.value,
     };
 
     fetch(API.player,{
@@ -30,11 +29,12 @@ class Card extends Component {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      method: 'patch',
+      method: 'PATCH',
       body: JSON.stringify({ 
-         name : e.target.name.value 
+        name : player.name.value,
+        team: player.team.value
       })
-    })
+    });
   }
 
   render(){
