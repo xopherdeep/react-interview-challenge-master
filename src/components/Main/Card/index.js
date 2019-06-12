@@ -1,21 +1,15 @@
 import React, { Component } from "react";
-import Button from '@material-ui/core/Button';
 import "./_card.css";
 import SelectTeam from "../SelectTeam";
-import Switch from '@material-ui/core/Switch';
+
 import Input from '@material-ui/core/Input';
 import BottomNavigation from '@material-ui/core/BottomNavigation';
-import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import EditIcon from '@material-ui/icons/Edit';
 import RestoreIcon from '@material-ui/icons/Save';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import IconButton from '@material-ui/core/IconButton';
 
 import MCard from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardMedia from '@material-ui/core/CardMedia';
-import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
 
 class Card extends Component {
   state = {
@@ -69,7 +63,7 @@ class Card extends Component {
               disabled={card.state.readonly} 
             />
           </div>
-          <BottomNavigation>
+          <BottomNavigation >
               <IconButton aria-label="Edit/Save"
                 onClick={card.toggleReadonly} 
                 color={card.state.readonly ? "inherit" : "primary" } 
