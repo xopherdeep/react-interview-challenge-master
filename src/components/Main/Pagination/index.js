@@ -9,12 +9,15 @@ import './_pagination.css';
 class Pagination extends Component {
   state = {
     page : 0,
-    first: 1,
+    first: 0,
     prev : 0,
     next : 0,
     last : 0,
+    total: 0,
+    limit: 0
   }
-  setPageState = (currentPage) => {
+  setPage = (currentPage) => {
+    currentPage = currentPage ? currentPage : 1;
     const page = this;
     page.setState({
       page: currentPage,
@@ -27,53 +30,60 @@ class Pagination extends Component {
   }
   clickFirst = () =>{
     const page = this;
-    page.setPageState(page.state.first);
+    page.setPage(page.state.first);
   }
   clickPrev = () =>{
     const page = this;
-    page.setPageState(page.state.prev);
+    page.setPage(page.state.prev);
   }
   clickNext= () =>{
     const page = this;
-    page.setPageState(page.state.next);
+    page.setPage(page.state.next);
   }
   clickLast= () =>{
     const page = this;
-    page.setPageState(page.state.last);
+    page.setPage(page.state.last);
   }
   componentDidMount(){
     const page = this;
-    page.setPageState(page.props.page);
-    console.log(page.state);
+    page.setPage(page.props.page);
   }
   render(){
     const page = this;
-
-    return <div className="pagination-container">
-          <IconButton  aria-label="First" color="inherit"
-            onClick={page.clickFirst} disabled={page.props.page <= 1}
-          >
-              <FastRewind />
-          </IconButton>
-          <IconButton aria-label="First" color="inherit"
-            onClick={page.clickPrev} disabled={page.props.page <= 1}
-          >
-              <Back />
-          </IconButton>
-          {page.props.page}
-          <IconButton aria-label="First" color="inherit"
-            onClick={page.clickNext} disabled={page.props.page >= page.state.last}  
-          >
-              <Forward />
-          </IconButton>
-          <IconButton aria-label="First" color="inherit"
-            onClick={page.clickLast} disabled={page.props.page == page.state.last} 
-          >
-              <FastForward />
-          </IconButton>
-    </div>
+    return ( 
+      <div className="pagination-container">
+        <IconButton  aria-label="First"
+          color="inherit"
+          onClick={page.clickFirst} 
+          disabled={page.props.page <= 1}
+        >
+          <FastRewind />
+        </IconButton>
+        <IconButton aria-label="Prev"
+          color="inherit"
+          onClick={page.clickPrev} 
+          disabled={page.props.page <= 1}
+        >
+          <Back />
+        </IconButton>
+        {page.props.page}
+        <IconButton aria-label="Next"
+          color="inherit"
+          onClick={page.clickNext} 
+          disabled={page.props.page >= page.state.last}  
+        >
+          <Forward />
+        </IconButton>
+        <IconButton aria-label="Last"
+          color="inherit"
+          onClick={page.clickLast} 
+          disabled={page.props.page === page.state.last} 
+        >
+          <FastForward />
+        </IconButton>
+      </div>
+    );
   }
 }
 
 export default Pagination;
-

@@ -1,26 +1,17 @@
 import React, { Component } from "react";
+
+import Pagination from "./Pagination";
+import CardList from "./CardList";
+import styles from "./styles";
+import "./_style.css";
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import SearchIcon from '@material-ui/icons/Search';
-import Search from "./Search";
-import Favorites from "./Favorites";
-import Pagination from "./Pagination";
-import Card from "./Card";
-import styles from "./styles";
-import Modal from 'react-modal';
-
 import IconButton from '@material-ui/core/IconButton';
 import InputBase from '@material-ui/core/InputBase';
 import Badge from '@material-ui/core/Badge';
-import MenuItem from '@material-ui/core/MenuItem';
-import Menu from '@material-ui/core/Menu';
-import MenuIcon from '@material-ui/icons/Menu';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import HeartIcon from '@material-ui/icons/Favorite';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import MoreIcon from '@material-ui/icons/MoreVert';
 
 const API = {
   players : 'http://localhost:3008/players',
@@ -31,158 +22,137 @@ const API = {
 class Main extends Component {
   constructor(props) {
     super(props);
+    const app = this;
 
-    this.state = {
-      search: null,
+    app.state = {
+      isLoading: false,
+      favorites: [],
+      teams: [],
       players : [],
-      totalPlayers: 0,
+      search: '',
       page: 1,
       limit: 10,
-      teams: [],
-      favorites: [],
-      isLoading: false,
     };
   }
 
-  loadPlayers = (search) => {
-    const app = this;
-    const page = '?_page='+app.state.page;
-    const limit = '&_limit='+app.state.limit;
-    const query = (app.state.search) ? '&q='+app.state.search : '';
-
-    fetch(API.players+page+limit+query)
-      .then(countPages)
-      .then(data => app.setState({ players: data }));
-
-    function countPages(response){
-      app.setState({ 
-        totalPlayers: response.headers.get('X-Total-Count'), 
-        paginate: response.headers.get('Link') 
-      })
-      return response.json();
-    }
-  }
-
-  setPage = (page) => {
-    const app = this;
-    app.setState({ page : page }, app.loadPlayers);
-  }
-
-  onTextChange = (e) => {
-    this.setState({
-      search : e.target.value,
-    },this.loadPlayers);
-  }
-
-  toggleFavorite = () => {
-    fetch(API.favorites)
-      .then(response => response.json())
-      .then(data => this.setState({ favorites: data, isLoading: false  }));
-  }
   render() {
     const app = this;
-    const { search, players, favorites, teams, isLoading } = app.state;
 
-    let listPlayers = players.map(playersCard);
-    function playersCard(player){
-      const team = teams.find(matchTeamById);
-
-      function matchTeamById(team){
-        return team.id === player.team;
-      }
-
-      let isFavorite = false;
-      const favorite = favorites.findIndex(f => f.player == player.id)
-      if( favorite >= 0 ){
-        isFavorite = favorites[favorite].checked ;
-      }
-      console.log(isFavorite)
-
-      if(typeof(team) == 'object')
-        player.team = team;
-
-      const toggleReadonly = app.handleOpenModal;
-      return <Card isFavorite={isFavorite} {...player} teams={teams} toggleReadonly={toggleReadonly} toggleFavorite={app.toggleFavorite}/>;
-    }
-
-    if (isLoading) {
+    if (app.isLoading) {
       return <p>Loading ...</p>;
     }
-     const classes= {
-       title : {
-         width: '200px'
-       
-       },
-       search : {
-         marginLeft: '20px',
-         width: '60%'
-       },
-       inputRoot : {
-         color: 'white',
-         paddingLeft: '25px'
-       },
-       inputInput: {
-         color: 'white'
-       },
-        searchIcon: {
-          width: '25px',
-          height: '50%',
-          position: 'absolute',
-          pointerEvents: 'none',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        },
-     };
 
     return (
-      <div style={{ ...styles.container, ...app.props.style }}>
-      <AppBar position="static">
+      <div>
+        <AppBar position="static">
           <Toolbar>
-            <Typography variant="h6" style={classes.title}>
+            <Typography variant="h5" style={styles.title}>
               NBA Interview
             </Typography>
-              <div style={classes.search}>
-                <div style={classes.searchIcon}>
-                  <SearchIcon />
-                </div>
-                <InputBase
-                  placeholder="Search…"
-                  style={classes.inputRoot}
-                  onChange={app.onTextChange}
-                  inputProps={{ 'aria-label': 'Search' }}
-                />
+            <Pagination setPage={app.setPage} page={app.state.page} total={app.state.totalCount} limit={app.state.limit}/>
+            <div style={styles.search}>
+              <div style={styles.searchIcon}>
+                <SearchIcon />
               </div>
-              <div className={classes.grow} />
-              <div className={classes.sectionDesktop}>
-                <Pagination setPage={app.setPage} page={app.state.page} total={app.state.totalPlayers} limit={app.state.limit}/>
-                <IconButton aria-label="Show 4 new mails" color="inherit">
-                  <Badge badgeContent={favorites.length} color="secondary">
-                    <HeartIcon />
-                  </Badge>
-                </IconButton>
-
-              </div>
+              <InputBase
+                placeholder="Search…"
+                style={styles.inputRoot}
+                onChange={app.setSearch}
+                inputProps={{ 'aria-label': 'Search' }}
+              />
+            </div>
+            <div style={styles.grow} />
+            <div className={styles.sectionDesktop}>
+              <IconButton aria-label="My Favorites" color="inherit">
+                <Badge badgeContent={app.state.favorites.length} color="secondary">
+                  <HeartIcon />
+                </Badge>
+              </IconButton>
+            </div>
           </Toolbar>
         </AppBar>
-        <div style={styles.title}></div>
-        {listPlayers}
+        <div style={styles.players}>
+          <CardList 
+            teams={app.state.teams}
+            players={app.state.players}
+            favorites={app.state.favorites}
+            toggleFavorite={app.setFavorites} 
+          /> 
+        </div>
       </div>
     );
   }
 
   componentDidMount(){
-    this.setState({ isLoading: true });
+    const app = this;
+    app.loadData();
+  }
 
-    this.loadPlayers();
+  loadData = () => {
+    const app = this;
+    app.setState({ isLoading: true });
+    app.loadTeams()
+      .then(app.loadFavorites)
+      .then(app.hasLoaded);
+  }
 
-    fetch(API.teams)
+  loadFavorites = () => {
+    const app = this;
+    return fetch(API.favorites)
       .then(response => response.json())
-      .then(data => this.setState({ teams: data }));
+      .then(data => app.setState({ favorites: data }))
+  };
 
-    fetch(API.favorites)
+  loadTeams = () => {
+    const app = this;
+    return fetch(API.teams)
       .then(response => response.json())
-      .then(data => this.setState({ favorites: data, isLoading: false  }));
+      .then(data => app.setState({ teams: data }))
+  };
+
+  loadPlayers = () => {
+    const app = this;
+    const page = '?_page='+app.state.page;
+    const limit = '&_limit='+app.state.limit;
+    const query = (app.state.search) ? '&q='+app.state.search : '';
+
+    return fetch(API.players + page + limit + query)
+      .then(setTotalCount)
+      .then(data => app.setState({ players: data }));
+
+    function setTotalCount(response){
+      app.setState({ 
+        totalCount: response.headers.get('X-Total-Count') 
+      })
+      return response.json();
+    }
+  }
+
+  hasLoaded = () => {
+    const app = this;
+    app.setState({ isLoading: false  });
+  }
+
+  setPage = (page) => {
+    const app = this;
+    app.setState({ page : page, isLoading: true }, loadPage);
+    function loadPage(){
+      app.loadPlayers().then(app.hasLoaded) 
+    }
+  }
+
+  setSearch = (e) => {
+    const app = this;
+    app.setState({
+      search : e.target.value,
+      page : 1
+    }, app.loadPlayers);
+  }
+
+  setFavorites = () => {
+    return fetch(API.favorites)
+      .then(response => response.json())
+      .then(data => this.setState({ favorites: data }));
   }
 }
 

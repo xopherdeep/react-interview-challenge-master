@@ -18,8 +18,8 @@ class SelectTeam extends Component {
     function teamOptions(team){
       return(
         <MenuItem 
+          key={team.id}
           value={team.id} 
-          selected={team.id === selectTeam.props.activeTeam}
         >
           {team.name}
         </MenuItem>
@@ -30,6 +30,7 @@ class SelectTeam extends Component {
       <div>
         <FormControl >
         <Select
+          key={selectTeam.props.id}
           value={selectTeam.state.team}
           onChange={(e)=>{
             selectTeam.setState({ team : e.target.value});
