@@ -10,7 +10,7 @@
         "react-dom": "^16.8.6",
         "react-modal": "^3.8.1",
         "react-paginate": "^6.3.0",
-        "react-scripts": "3.0.0"
+        "react-scripts": "5.0.1"
     },
     "scripts": {
         "start": "./node_modules/.bin/concurrently \"cd ./node_modules/react-interview-json-server && node index.js\" \"react-scripts start\"",
